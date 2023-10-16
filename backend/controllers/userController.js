@@ -58,5 +58,47 @@ export class userController {
     })
 
 
+    // @desc     Register new user 
+    // @route    POST /api/users
+    // @access   Public 
+    loginUser = asyncHandler(async(req, res)=>{
+
+        const {email , password} = req.body;
+
+        const user = await User.findOne({email})
+
+        if(user && (await bcrypt.compare(password , user.password)))
+        {
+            res.status(201).json({
+                _id : user.id ,
+                name : user.name ,
+                role: user.role,
+                token : jwtToken.generateToken(user._id)
+            });
+        }else{
+            res.status(401)
+            throw Error('Invalide credentails')
+        }
+    }) 
+
+
+        // @desc     get user data 
+    // @route    GET /api/users/me
+    // @access   Private 
+    getMe = asyncHandler(async(req , res )=>{
+
+        const { _id , name , email , role } = await User.findById(req.user.id)
+
+        res.status(200).json({
+            id:_id,
+            name,
+            email,
+            role,
+        })
+
+    })
+
+
+
 
 }

@@ -13,7 +13,7 @@ export class userController {
 
 
     registerUser = asyncHandler(async (req , res )=>{
-        const { name , email ,role , password } = req. body;
+        const { name , email ,role , password } = req.body;
 
         if (!name || !email || !password || !role ){
             res.status(400)
@@ -132,6 +132,68 @@ export class userController {
           return res.status(400).send("Invalid token");
         }
     });
+
+    forgotPassword = asyncHandler(async(req , res )=>{
+
+        const { email } = req.body
+
+        if (!email){
+            res.status(400)
+            throw new Error('Please add all fields')
+        }
+
+        const user = await User.findOne({email});
+        if(!user){
+            res.status(400)
+            throw new Error('no user with this email found')
+        }
+
+        const verificationToken = jwtToken.generateToken(user._id , '10m') 
+        const verificationLink = `${process.env.BASE_URL}/api/users/newPass/${verificationToken}`;
+        await sendEmail(user.email, "Forgot Password", verificationLink);
+        res.json({ message : "please check your email "})
+
+
+    });
       
+    resetPassword = asyncHandler(async(req,res)=>{
+
+        const token = req.params.token;
+        const {newPassword} = req.body;
+
+        if ( !newPassword ){
+            res.status(400)
+            throw new Error('Please add all fieleds')
+        }
+        
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+          
+            const userId = decoded.id;
+          
+            const user = await User.findOne({ _id: userId });
+          
+            if (!user) {
+              return res.status(400).send("Invalid user");
+            }
+
+            const salt = await bcrypt.genSalt(10)
+            const hashedPassword = await bcrypt.hash(newPassword,salt);
+            
+            await User.updateOne({ _id: userId }, { password: hashedPassword });
+          
+            res.send("Password reseted successfully");
+  
+          } catch (err) {
+  
+            if (err.name === "TokenExpiredError") {
+              return res.status(400).send("Your token has expired");
+            }
+                  
+            return res.status(400).send("Invalid token");
+          }
+
+    });
+    
 
 }

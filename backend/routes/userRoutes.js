@@ -11,8 +11,10 @@ userRoutes.post('/login', UserController.loginUser)
 
 userRoutes.get('/me',authMiddleware.protect ,UserController.getMe)
 
-
 userRoutes.get("/verify/:token", UserController.emailVerification );
 
+userRoutes.post("/forget",UserController.forgotPassword )
+
+userRoutes.post("/newPass/:token",UserController.resetPassword)
 
 export {userRoutes}

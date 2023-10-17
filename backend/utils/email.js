@@ -5,6 +5,8 @@ import nodemailer from "nodemailer"
 const sendEmail = async (email, subject, verificationLink) => {
   try {
 
+    let htmlTemplate ;
+
     let transporter = nodemailer.createTransport({
       host: process.env.HOST,
       port: 2525,
@@ -14,7 +16,8 @@ const sendEmail = async (email, subject, verificationLink) => {
       }
     });
 
-    const htmlTemplate = `
+    if(subject == "Verify Email"){
+     htmlTemplate = `
       <!DOCTYPE html>
       <html>
       <head>
@@ -31,7 +34,26 @@ const sendEmail = async (email, subject, verificationLink) => {
           </div>
       </body>
       </html>
-    `;
+    `;}
+
+    if(subject == "Forgot Password"){
+      htmlTemplate = `
+       <!DOCTYPE html>
+       <html>
+       <head>
+           <title>Forgot Password</title>
+       </head>
+       <body>
+           <div>
+               <h2>Forgot Password</h2>
+               <p>Dear user</p>
+               <p>Thank you for following up . Please client link to reset your password:</p>
+               <p><a href="${verificationLink}">reset password</a></p>
+               <p>Best regards,<br>AlloMedia</p>
+           </div>
+       </body>
+       </html>
+     `;}
 
     await transporter.sendMail({
       from: "your-email@example.com",

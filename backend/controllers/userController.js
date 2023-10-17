@@ -12,7 +12,6 @@ import jwt from "jsonwebtoken";
 export class userController {
 
 
-
     registerUser = asyncHandler(async (req , res )=>{
         const { name , email ,role , password } = req. body;
 
@@ -103,27 +102,36 @@ export class userController {
 
     emailVerification = asyncHandler(async (req, res) => {
 
-          const token = req.params.token;
+        const token = req.params.token;
 
-          const decoded = jwt.verify(token, process.env.JWT_SECRET); 
-      
-          const userId = decoded.id; 
-      
+        try {
+          const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        
+          const userId = decoded.id;
+        
           const user = await User.findOne({ _id: userId });
-      
+        
           if (!user) {
             return res.status(400).send("Invalid user");
           }
-      
+        
           if (user.verified) {
             return res.status(400).send("Email is already verified");
           }
-      
+        
           await User.updateOne({ _id: userId }, { isEmailVerified: true });
-      
+        
           res.send("Email verified successfully");
 
-      });
+        } catch (err) {
+
+          if (err.name === "TokenExpiredError") {
+            return res.status(400).send("Your token has expired");
+          }
+                
+          return res.status(400).send("Invalid token");
+        }
+    });
       
 
 }

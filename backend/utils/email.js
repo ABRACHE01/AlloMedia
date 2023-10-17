@@ -1,26 +1,16 @@
 import nodemailer from "nodemailer"
 
-   // const transporter = nodemailer.createTransport({
-    //   host: process.env.HOST,
-    //   service: process.env.SERVICE,
-    //   port: 587,
-    //   secure: true,
-    //   auth: {
-    //     user: process.env.USER,
-    //     pass: process.env.PASS,
-    //   },
-    // });
 
 
 const sendEmail = async (email, subject, verificationLink) => {
   try {
 
     let transporter = nodemailer.createTransport({
-      host: "sandbox.smtp.mailtrap.io",
+      host: process.env.HOST,
       port: 2525,
       auth: {
-        user: "e0400916a8ed83",
-        pass: "abfd33a025ec53"
+        user: 'e0400916a8ed83',
+        pass: process.env.PASS
       }
     });
 
@@ -33,11 +23,11 @@ const sendEmail = async (email, subject, verificationLink) => {
       <body>
           <div>
               <h2>Email Verification</h2>
-              <p>Dear user,</p>
+              <p>Dear user</p>
               <p>Thank you for signing up. Please verify your email address to activate your account:</p>
               <p><a href="${verificationLink}">Verify your email</a></p>
               <p>If you did not create an account or did not request this verification, please ignore this email.</p>
-              <p>Best regards,<br>Your Company Name</p>
+              <p>Best regards,<br>AlloMedia</p>
           </div>
       </body>
       </html>

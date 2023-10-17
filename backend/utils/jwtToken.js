@@ -3,10 +3,10 @@ import jwt from "jsonwebtoken";
 
 export class jwtToken{
 
-    static generateToken(id){
+    static generateToken(id , duration ){
 
         return jwt.sign({ id }, process.env.JWT_SECRET, {
-            expiresIn: '30d',
+            expiresIn: duration ,
         })
 
     }

@@ -14,10 +14,7 @@ export class authMiddleware{
             try{
                 token = req.headers.authorization.split(' ')[1]
 
-                //verify the token 
                 const decoded = jwt.verify(token , process.env.JWT_SECRET)
-
-                //GET USER FROM THE TOKEN 
 
                 req.user = await User.findById(decoded.id).select('-password')
 

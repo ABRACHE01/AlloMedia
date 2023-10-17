@@ -2,15 +2,16 @@ import { User } from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import asyncHandler from 'express-async-handler';
 import { jwtToken } from '../utils/jwtToken.js';
+import {sendEmail} from "../utils/email.js";
+
+import jwt from "jsonwebtoken";
+
 
 
 
 export class userController {
 
 
-    // @desc     Register new user 
-    // @route    POST /api/users
-    // @access   Public 
     registerUser = asyncHandler(async (req , res )=>{
         const { name , email ,role , password } = req. body;
 
@@ -47,7 +48,7 @@ export class userController {
                 name : user.name,
                 email: user.email ,
                 role: user.role,
-                token: jwtToken.generateToken(user._id)
+                token: jwtToken.generateToken(user._id , '30d')
 
             })
         }else{
@@ -57,10 +58,6 @@ export class userController {
             
     })
 
-
-    // @desc     Register new user 
-    // @route    POST /api/users
-    // @access   Public 
     loginUser = asyncHandler(async(req, res)=>{
 
         const {email , password} = req.body;
@@ -69,22 +66,27 @@ export class userController {
 
         if(user && (await bcrypt.compare(password , user.password)))
         {
+            const verificationToken = jwtToken.generateToken(user._id , '10m')
+            
+            const verificationLink = `${process.env.BASE_URL}/api/users/verify/${verificationToken}`;
+            await sendEmail(user.email, "Verify Email", verificationLink);
+
+        if(user.isEmailVerified){
             res.status(201).json({
                 _id : user.id ,
                 name : user.name ,
                 role: user.role,
-                token : jwtToken.generateToken(user._id)
+                token : verificationToken,
+                isEmailVerified:user.isEmailVerified,
             });
+        }else{res.json({ message : "please check your email "})}
+
         }else{
             res.status(401)
             throw Error('Invalide credentails')
         }
     }) 
 
-
-        // @desc     get user data 
-    // @route    GET /api/users/me
-    // @access   Private 
     getMe = asyncHandler(async(req , res )=>{
 
         const { _id , name , email , role } = await User.findById(req.user.id)
@@ -98,7 +100,38 @@ export class userController {
 
     })
 
+    emailVerification = asyncHandler(async (req, res) => {
 
+        const token = req.params.token;
 
+        try {
+          const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        
+          const userId = decoded.id;
+        
+          const user = await User.findOne({ _id: userId });
+        
+          if (!user) {
+            return res.status(400).send("Invalid user");
+          }
+        
+          if (user.verified) {
+            return res.status(400).send("Email is already verified");
+          }
+        
+          await User.updateOne({ _id: userId }, { isEmailVerified: true });
+        
+          res.send("Email verified successfully");
+
+        } catch (err) {
+
+          if (err.name === "TokenExpiredError") {
+            return res.status(400).send("Your token has expired");
+          }
+                
+          return res.status(400).send("Invalid token");
+        }
+    });
+      
 
 }

@@ -3,7 +3,7 @@ import  express from "express";
 import {userRoutes} from './routes/userRoutes.js'
 import colors from "colors"
 import {connectDB} from "./config/database.js"
-
+import {seedRoles} from "./config/roleSeeder.js"
 import cookieParser from "cookie-parser"
 
 connectDB();

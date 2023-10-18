@@ -14,7 +14,7 @@ export class authMiddleware{
             try{
                 token = req.cookies.token
                 const decoded = jwt.verify(token , process.env.JWT_SECRET)
-                req.user = await User.findById(decoded.userPayload.id).select('-password')
+                req.user = await User.findById(decoded.userPayload.id).populate('role').select('-password')
                 next()
             }catch(error){
                 console.log(error)

@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import asyncHandler from 'express-async-handler';
 import { jwtToken } from '../utils/jwtToken.js';
 import {sendEmail} from "../utils/email.js";
+import { Role } from "../models/roleModel.js";
 
 import jwt from "jsonwebtoken";
 
@@ -26,6 +27,12 @@ export class userController {
             throw new Error('this user already exists')
         }
 
+        const roleExists = await Role.findOne({ name: role });
+        if (!roleExists) {
+            res.status(400);
+            throw new Error('Invalid role');
+        }
+
 
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(password,salt);
@@ -34,7 +41,7 @@ export class userController {
         const user = await User.create({
             name ,
             email ,
-            role,
+            role: roleExists._id,
             password : hashedPassword,
 
         })
@@ -52,29 +59,29 @@ export class userController {
 
         const {email , password} = req.body;
 
-        const user = await User.findOne({email})
+        const user = await User.findOne({ email }).populate('role');
+        
 
         if(user && (await bcrypt.compare(password , user.password)))
         {
-          
-
+            const userPayload = {
+                id: user.id,
+                name: user.name,
+                role: user.role,
+                isEmailVerified: user.isEmailVerified,
+              };
+                          
+        
         if(user.isEmailVerified){
             
-            const userPayload = {
-                id : user.id ,
-                name : user.name ,
-                role: user.role,
-                isEmailVerified:user.isEmailVerified,
-            }   
-
             const loginToken = jwtToken.generateToken( userPayload , '48h');
             res.cookie('token', loginToken, { httpOnly: true, secure: true });
             res.status(201).json({
-                message: 'you are logged in',
+                message: `hello ${ user.name }, you are logged in as a ${user.role.name}`,
             });
-            
+
         }else{
-            const verificationToken = jwtToken.generateToken(user._id , '10m')
+            const verificationToken = jwtToken.generateToken(userPayload , '10m')
             const verificationLink = `${process.env.BASE_URL}/api/users/verify/${verificationToken}`;
             await sendEmail(user.email, "Verify Email", verificationLink);
             res.json({ message : "please check your email "})
@@ -86,15 +93,14 @@ export class userController {
         }
     }) 
 
-    getMe = asyncHandler(async(req , res )=>{
+    getMe = asyncHandler( (req , res )=>{
 
-        const { _id , name , email , role } = await User.findById(req.user.id)
-
+        const { _id , name , email , role } =  req.user
         res.status(200).json({
             id:_id,
             name,
             email,
-            role,
+            role:role.name,
         })
 
     })
@@ -105,11 +111,10 @@ export class userController {
 
         try {
           const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
-          const userId = decoded.id;
-        
-          const user = await User.findOne({ _id: userId });
-        
+            
+          const  id  = decoded.userPayload.id;
+          const user = await User.findOne({ _id: id });
+
           if (!user) {
             return res.status(400).send("Invalid user");
           }
@@ -118,7 +123,7 @@ export class userController {
             return res.status(400).send("Email is already verified");
           }
         
-          await User.updateOne({ _id: userId }, { isEmailVerified: true });
+          await User.updateOne({ _id: id }, { isEmailVerified: true });
         
           res.send("Email verified successfully"); 
 

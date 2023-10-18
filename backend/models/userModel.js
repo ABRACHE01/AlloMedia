@@ -18,9 +18,9 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Please add a password']
     },
     role: {
-        type: String,
-        required: [true, 'Please add your role'],
-        enum: ['client', 'deliver'],
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Role',
+        required: [true, 'Please add a Role'],
     },
     isEmailVerified: {
         type: Boolean,

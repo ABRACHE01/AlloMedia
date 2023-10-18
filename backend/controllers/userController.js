@@ -19,7 +19,6 @@ export class userController {
             res.status(400)
             throw new Error('Please add all fieleds')
         }
-        //check if the user exist 
 
         const userExists = await User.findOne({email})
         if(userExists){
@@ -27,12 +26,10 @@ export class userController {
             throw new Error('this user already exists')
         }
 
-        //hash the password 
 
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(password,salt);
 
-        //create user 
 
         const user = await User.create({
             name ,
@@ -43,14 +40,7 @@ export class userController {
         })
 
         if(user){
-            res.status(201).json({
-                _id: user.id ,
-                name : user.name,
-                email: user.email ,
-                role: user.role,
-                token: jwtToken.generateToken(user._id , '30d')
-
-            })
+            res.status(201).send('you are registred')
         }else{
             res.status(400)
             throw new Error('Invalide user data ')
@@ -66,20 +56,29 @@ export class userController {
 
         if(user && (await bcrypt.compare(password , user.password)))
         {
-            const verificationToken = jwtToken.generateToken(user._id , '10m')
-            
-            const verificationLink = `${process.env.BASE_URL}/api/users/verify/${verificationToken}`;
-            await sendEmail(user.email, "Verify Email", verificationLink);
+          
 
         if(user.isEmailVerified){
-            res.status(201).json({
-                _id : user.id ,
+            
+            const userPayload = {
+                id : user.id ,
                 name : user.name ,
                 role: user.role,
-                token : verificationToken,
                 isEmailVerified:user.isEmailVerified,
+            }   
+
+            const loginToken = jwtToken.generateToken( userPayload , '48h');
+            res.cookie('token', loginToken, { httpOnly: true, secure: true });
+            res.status(201).json({
+                message: 'you are logged in',
             });
-        }else{res.json({ message : "please check your email "})}
+            
+        }else{
+            const verificationToken = jwtToken.generateToken(user._id , '10m')
+            const verificationLink = `${process.env.BASE_URL}/api/users/verify/${verificationToken}`;
+            await sendEmail(user.email, "Verify Email", verificationLink);
+            res.json({ message : "please check your email "})
+        }
 
         }else{
             res.status(401)
@@ -121,7 +120,7 @@ export class userController {
         
           await User.updateOne({ _id: userId }, { isEmailVerified: true });
         
-          res.send("Email verified successfully");
+          res.send("Email verified successfully"); 
 
         } catch (err) {
 
@@ -133,6 +132,8 @@ export class userController {
         }
     });
 
+    
+    //forger password 
     forgotPassword = asyncHandler(async(req , res )=>{
 
         const { email } = req.body
@@ -158,7 +159,7 @@ export class userController {
       
     resetPassword = asyncHandler(async(req,res)=>{
 
-        const token = req.params.token;
+        const token = req.params.token ;
         const {newPassword} = req.body;
 
         if ( !newPassword ){
@@ -169,7 +170,7 @@ export class userController {
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
           
-            const userId = decoded.id;
+            const userId = decoded.userPayload;
           
             const user = await User.findOne({ _id: userId });
           
@@ -194,6 +195,65 @@ export class userController {
           }
 
     });
-    
+
+
+    //reset password
+    sendEmail=  asyncHandler(async(req,res)=>{
+        
+        const { email }=req.user;
+
+        if (!email){
+            res.status(400)
+            throw new Error('Please add all fields')
+        }
+
+        const user = await User.findOne({email});
+        if(!user){
+            res.status(400)
+            throw new Error('no user with this email found')
+        }
+
+        const verificationToken = jwtToken.generateToken(user._id , '10m')
+        const verificationLink = `${process.env.BASE_URL}/api/users/newPassloggedin/${verificationToken}`;
+        await sendEmail(user.email, "Forgot Password", verificationLink);
+        res.json({ message : "please check your email "})
+
+    });
+    resetPasswordAsLoggedIn = asyncHandler(async(req,res)=>{
+
+
+        const {newPassword , oldPassword } = req.body;
+
+        console.log(req)
+
+        const user = await User.findById(req.user.id);
+        
+
+        if ( !newPassword  || !oldPassword ){
+            res.status(400)
+            throw new Error('Please add all fieleds')
+        }
+
+        if( user && (await bcrypt.compare( oldPassword , user.password))){
+
+            const salt = await bcrypt.genSalt(10)
+            const hashedPassword = await bcrypt.hash(newPassword,salt);
+            
+            await User.updateOne({ _id: req.user.id }, { password: hashedPassword });
+          
+            res.send("Password reseted successfully");
+            
+        }else{
+            res.status(400)
+            throw new Error('invalid credantele')
+        }
+        
+
+    });
+
+    logout = (req, res) => {
+        res.clearCookie('token').send('Logged out successfully');
+      }
+
 
 }

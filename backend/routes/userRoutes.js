@@ -13,8 +13,18 @@ userRoutes.get('/me',authMiddleware.protect ,UserController.getMe)
 
 userRoutes.get("/verify/:token", UserController.emailVerification );
 
-userRoutes.post("/forget",UserController.forgotPassword )
+//send email after auth for rest
+userRoutes.post("/forget",UserController.forgotPassword );
+//reset password befor auth 
+userRoutes.post("/newPass/:token",UserController.resetPassword);
 
-userRoutes.post("/newPass/:token",UserController.resetPassword)
+//send email after auth for rest
+userRoutes.post("/profileResetPass", authMiddleware.protect, UserController.sendEmail);
+//reset password after auth 
+userRoutes.post("/newPassloggedin/:token",authMiddleware.protect, UserController.resetPasswordAsLoggedIn);
+
+userRoutes.get("/logout", authMiddleware.protect, UserController.logout);
+
+
 
 export {userRoutes}

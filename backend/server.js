@@ -3,9 +3,14 @@ import  express from "express";
 import {userRoutes} from './routes/userRoutes.js'
 import colors from "colors"
 import {connectDB} from "./config/database.js"
+
+import cookieParser from "cookie-parser"
+
 connectDB();
 
 const app = express();
+app.use(express.json());
+app.use(cookieParser());
 import { config } from 'dotenv';
 config();
 

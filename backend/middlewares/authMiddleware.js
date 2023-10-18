@@ -10,20 +10,17 @@ export class authMiddleware{
 
         let token 
 
-        if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
+        if (req.cookies.token || res.params.token ){
             try{
-                token = req.headers.authorization.split(' ')[1]
-
+                token = req.cookies.token
                 const decoded = jwt.verify(token , process.env.JWT_SECRET)
-
-                req.user = await User.findById(decoded.id).select('-password')
-
+                req.user = await User.findById(decoded.userPayload.id).select('-password')
                 next()
             }catch(error){
                 console.log(error)
                 res.status(401)
                 throw new Error('not authorased ') 
-
+            
             }
         }
 

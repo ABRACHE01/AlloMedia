@@ -9,8 +9,6 @@ userRoutes.post('/', UserController.registerUser)
 
 userRoutes.post('/login', UserController.loginUser)
 
-userRoutes.get('/me',authMiddleware.protect ,UserController.getMe)
-
 userRoutes.get("/verify/:token", UserController.emailVerification );
 
 //send email after auth for rest

@@ -7,5 +7,6 @@ import { deliverController } from '../controllers/deliverController.js';
 
 deliverRoutes.get('/deliver/me',authMiddleware.protect ,deliverController.deliverProfile)
 
+deliverRoutes.get('/deliver/logout',authMiddleware.protect ,deliverController.logout)
 
 export {deliverRoutes}

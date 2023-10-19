@@ -9,4 +9,10 @@ export class clientController{
         UserController.getMe(req ,res)
     }
 
+    static logout = (req, res )=>{
+
+        UserController.logout(req ,res)
+
+    }
+
 }

@@ -2,10 +2,12 @@ import express from 'express';
 const userRoutes = express.Router();
 import {userController} from "../controllers/userController.js"
 import {authMiddleware} from "../middlewares/authMiddleware.js"
+import upload from "../utils/handelimages.js"
+
 
 const UserController = new userController() ; 
 
-userRoutes.post('/', UserController.registerUser)
+userRoutes.post('/',upload.single('profileImage'), UserController.registerUser)
 
 userRoutes.post('/login', UserController.loginUser)
 

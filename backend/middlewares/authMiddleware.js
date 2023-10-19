@@ -62,7 +62,7 @@ export class authMiddleware {
             default:
               res.status(403).send('Access denied. User does not have the required role');
           }
-          
+
       } catch (error) {
         console.log(error);
         res.status(401);

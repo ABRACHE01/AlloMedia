@@ -10,4 +10,10 @@ export class adminController{
 
     }
 
+    static logout = (req, res )=>{
+
+        UserController.logout(req ,res)
+
+    }
+
 }

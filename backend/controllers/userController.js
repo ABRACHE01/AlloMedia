@@ -14,11 +14,12 @@ export class userController {
 
 
     registerUser = asyncHandler(async (req , res )=>{
-        const { name , email ,role , password } = req.body;
 
-        if (!name || !email || !password || !role ){
-            res.status(400)
-            throw new Error('Please add all fieleds')
+        const { name , email ,role , password  } = req.body;
+
+        if (!name || !email || !password || !role || !req.file ){
+            res.status(400);
+            throw new Error('Please add all required fields, including an image');
         }
 
         const userExists = await User.findOne({email})
@@ -37,17 +38,25 @@ export class userController {
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(password,salt);
 
+        const imagePath = req.file.path;
 
         const user = await User.create({
             name ,
             email ,
             role: roleExists._id,
             password : hashedPassword,
+            profileImage:imagePath,
 
         })
 
         if(user){
-            res.status(201).send('you are registred')
+            const userPayload = {
+                id: user.id,
+              };
+            const verificationToken = jwtToken.generateToken(userPayload , '10m')
+            const verificationLink = `${process.env.BASE_URL}/api/auth/verify/${verificationToken}`;
+            await sendEmail(user.email, "Verify Email", verificationLink);
+            res.json({ message : " you are registred please check your email "})
         }else{
             res.status(400)
             throw new Error('Invalide user data ')
@@ -82,8 +91,7 @@ export class userController {
 
         }else{
             const verificationToken = jwtToken.generateToken(userPayload , '10m')
-            const verificationLink = `${process.env.BASE_URL}/api/users/verify/${verificationToken}`;
-            await sendEmail(user.email, "Verify Email", verificationLink);
+            const verificationLink = `${process.env.BASE_URL}/api/auth/verify/${verificationToken}`;            await sendEmail(user.email, "Verify Email", verificationLink);
             res.json({ message : "please check your email "})
         }
 
@@ -155,7 +163,7 @@ export class userController {
         }
 
         const verificationToken = jwtToken.generateToken(user._id , '10m') 
-        const verificationLink = `${process.env.BASE_URL}/api/users/newPass/${verificationToken}`;
+        const verificationLink = `${process.env.BASE_URL}/api/auth/newPass/${verificationToken}`;
         await sendEmail(user.email, "Forgot Password", verificationLink);
         res.json({ message : "please check your email "})
 
@@ -219,7 +227,7 @@ export class userController {
         }
 
         const verificationToken = jwtToken.generateToken(user._id , '10m')
-        const verificationLink = `${process.env.BASE_URL}/api/users/newPassloggedin/${verificationToken}`;
+        const verificationLink = `${process.env.BASE_URL}/api/auth/newPassloggedin/${verificationToken}`;
         await sendEmail(user.email, "Forgot Password", verificationLink);
         res.json({ message : "please check your email "})
 
@@ -229,7 +237,6 @@ export class userController {
 
         const {newPassword , oldPassword } = req.body;
 
-        console.log(req)
 
         const user = await User.findById(req.user.id);
         

@@ -8,6 +8,11 @@ const userSchema = new mongoose.Schema({
         max: 255,
         required: [true, 'Please add a name']
     },
+    profileImage:{
+        type: String,
+        max: 255,
+        required: [true, 'Please add a profile picture']
+    },
     email: {
         type: String,
         required: [true, 'Please add an email'],

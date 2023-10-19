@@ -8,6 +8,11 @@ const userSchema = new mongoose.Schema({
         max: 255,
         required: [true, 'Please add a name']
     },
+    profileImage:{
+        type: String,
+        max: 255,
+        required: [true, 'Please add a profile picture']
+    },
     email: {
         type: String,
         required: [true, 'Please add an email'],
@@ -18,9 +23,9 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Please add a password']
     },
     role: {
-        type: String,
-        required: [true, 'Please add your role'],
-        enum: ['client', 'deliver'],
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Role',
+        required: [true, 'Please add a Role'],
     },
     isEmailVerified: {
         type: Boolean,

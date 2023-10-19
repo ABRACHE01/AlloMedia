@@ -18,6 +18,7 @@ export class userController {
         const { name , email ,role , password  } = req.body;
 
         if (!name || !email || !password || !role || !req.file ){
+            
             res.status(400);
             throw new Error('Please add all required fields, including an image');
         }

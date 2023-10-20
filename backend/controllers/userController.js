@@ -96,7 +96,7 @@ export class userController {
         if(user.isEmailVerified){
             
             const loginToken = jwtToken.generateToken( userPayload , '48h');
-            res.cookie('token', loginToken, { httpOnly: true, secure: true });
+            res.cookie('al_ui', loginToken, { httpOnly: true, secure: true });
             res.status(201).json({
                 message: `hello ${ user.name }, you are logged in as a ${user.role.name}`,
             });

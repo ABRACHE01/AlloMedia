@@ -9,4 +9,10 @@ deliverRoutes.get('/deliver/me',authMiddleware.protect ,deliverController.delive
 
 deliverRoutes.get('/deliver/logout',authMiddleware.protect ,deliverController.logout)
 
+//send email after auth for rest
+deliverRoutes.post("/deliver/profileResetPass", authMiddleware.protect, deliverController.sendEmail);
+
+//reset password after auth 
+deliverRoutes.post("/deliver/newPassloggedin/:token",authMiddleware.protect, deliverController.resetPasswordAsLoggedIn);
+
 export {deliverRoutes}

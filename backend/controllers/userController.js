@@ -4,6 +4,7 @@ import asyncHandler from 'express-async-handler';
 import { jwtToken } from '../utils/jwtToken.js';
 import {sendEmail} from "../utils/email.js";
 import { Role } from "../models/roleModel.js";
+import {userValidation} from "../validation/UserValidation.js"
 
 import jwt from "jsonwebtoken";
 
@@ -11,17 +12,22 @@ import jwt from "jsonwebtoken";
 
 
 export class userController {
-
+    
 
     registerUser = asyncHandler(async (req , res )=>{
 
-        const { name , email ,role , password  } = req.body;
+        let registerValidation = userValidation.registerValidate(req)
 
-        if (!name || !email || !password || !role || !req.file ){
-            
+        if (registerValidation.error) {
+            return res.status(400).json({ error: registerValidation.error.details.map(error=> error.message ) });
+        }
+
+        if (!req.file){
             res.status(400);
             throw new Error('Please add all required fields, including an image');
         }
+
+        const { name , email ,role , password  } = req.body;
 
         const userExists = await User.findOne({email})
         if(userExists){
@@ -34,7 +40,6 @@ export class userController {
             res.status(400);
             throw new Error('Invalid role');
         }
-
 
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(password,salt);
@@ -66,6 +71,12 @@ export class userController {
     })
 
     loginUser = asyncHandler(async(req, res)=>{
+        
+        let loginValidation = userValidation.loginValidate(req)
+
+        if (loginValidation.error) {
+            return res.status(400).json({ error: 'Invalide user credentails' });
+        }
 
         const {email , password} = req.body;
 
@@ -146,7 +157,6 @@ export class userController {
         }
     });
 
-    
     //forger password 
     forgotPassword = asyncHandler(async(req , res )=>{
 
@@ -173,14 +183,15 @@ export class userController {
       
     resetPassword = asyncHandler(async(req,res)=>{
 
+     
         const token = req.params.token ;
         const {newPassword} = req.body;
 
-        if ( !newPassword ){
-            res.status(400)
-            throw new Error('Please add all fieleds')
+        let resetPasswordValidation = userValidation.resetPassValidation(req)
+        if (resetPasswordValidation.error) {
+            return res.status(400).json({ error: resetPasswordValidation.error.details.map(error=> error.message ) });
         }
-        
+
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
           
@@ -210,7 +221,6 @@ export class userController {
 
     });
 
-
     //reset password
     sendEmail=  asyncHandler(async(req,res)=>{
         
@@ -233,18 +243,23 @@ export class userController {
         res.json({ message : "please check your email "})
 
     });
+
     resetPasswordAsLoggedIn = asyncHandler(async(req,res)=>{
 
 
         const {newPassword , oldPassword } = req.body;
 
+        let resetPasswordValidation = userValidation.resetPassValidation(req)
+        if (resetPasswordValidation.error) {
+            return res.status(400).json({ error: resetPasswordValidation.error.details.map(error=> error.message ) });
+        }
 
         const user = await User.findById(req.user.id);
         
 
-        if ( !newPassword  || !oldPassword ){
+        if ( !oldPassword ){
             res.status(400)
-            throw new Error('Please add all fieleds')
+             .json({ error : 'Please add old password in order to change password '})
         }
 
         if( user && (await bcrypt.compare( oldPassword , user.password))){

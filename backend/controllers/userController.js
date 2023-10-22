@@ -2,73 +2,70 @@ import { User } from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import asyncHandler from 'express-async-handler';
 import { jwtToken } from '../utils/jwtToken.js';
-import {sendEmail} from "../utils/email.js";
 import { Role } from "../models/roleModel.js";
 import {userValidation} from "../validation/UserValidation.js"
+import { sendEmail } from "../utils/email.js";
 
 import jwt from "jsonwebtoken";
 
 
 
 
-export class userController {
+export  class userController {
     
 
-    registerUser = asyncHandler(async (req , res )=>{
-
-        let registerValidation = userValidation.registerValidate(req)
-
+    registerUser = asyncHandler(async (req, res) => {
+        let registerValidation = userValidation.registerValidate(req);
+      
         if (registerValidation.error) {
-            return res.status(400).json({ error: registerValidation.error.details.map(error=> error.message ) });
+          return res
+            .status(400)
+            .json({ error: registerValidation.error.details.map((error) => error.message) });
         }
-
-        if (!req.file){
-            res.status(400);
-            throw new Error('Please add all required fields, including an image');
+      
+        if (!req.file) {
+          return res
+            .status(400)
+            .json({ error: 'Please add all required fields, including an image' });
         }
-
-        const { name , email ,role , password  } = req.body;
-
-        const userExists = await User.findOne({email})
-        if(userExists){
-            res.status(400)
-            throw new Error('this user already exists')
+      
+        const { name, email, role, password } = req.body;
+      
+        const userExists = await User.findOne({ email });
+        if (userExists) {
+          return res.status(400).json({ error: 'This user already exists' });
         }
-
+      
         const roleExists = await Role.findOne({ name: role });
         if (!roleExists) {
-            res.status(400);
-            throw new Error('Invalid role');
+          return res.status(400).json({ error: 'Invalid role' });
         }
-
-        const salt = await bcrypt.genSalt(10)
-        const hashedPassword = await bcrypt.hash(password,salt);
-
+      
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+      
         const imagePath = req.file.path;
-
+      
         const user = await User.create({
-            name ,
-            email ,
-            role: roleExists._id,
-            password : hashedPassword,
-            profileImage:imagePath,
-
-        })
-
-        if(user){
-            const userPayload = {
-                id: user.id,
-              };
-            const verificationToken = jwtToken.generateToken(userPayload , '10m')
-            const verificationLink = `${process.env.BASE_URL}/api/auth/verify/${verificationToken}`;
-            await sendEmail(user.email, "Verify Email", verificationLink);
-            res.json({ message : " you are registred please check your email "})
-        }else{
-            res.status(400)
-            throw new Error('Invalide user data ')
+          name,
+          email,
+          role: roleExists._id,
+          password: hashedPassword,
+          profileImage: imagePath,
+        });
+      
+        if (user) {
+          const userPayload = {
+            id: user.id,
+          };
+          const verificationToken = jwtToken.generateToken(userPayload, '10m');
+          const verificationLink = `${process.env.BASE_URL}/api/auth/verify/${verificationToken}`;
+          await sendEmail(user.email, 'Verify Email', verificationLink);
+          return res.status(200).json({ message: 'You are registered. Please check your email.' });
+        } else {
+          return res.status(400).json({ error: 'Invalid user data' });
         }
-            
-    })
+      });
 
     loginUser = asyncHandler(async(req, res)=>{
         
@@ -79,7 +76,7 @@ export class userController {
         }
 
         const {email , password} = req.body;
-
+        
         const user = await User.findOne({ email }).populate('role');
         
 
@@ -103,13 +100,13 @@ export class userController {
 
         }else{
             const verificationToken = jwtToken.generateToken(userPayload , '10m')
-            const verificationLink = `${process.env.BASE_URL}/api/auth/verify/${verificationToken}`;            await sendEmail(user.email, "Verify Email", verificationLink);
-            res.json({ message : "please check your email "})
+            const verificationLink = `${process.env.BASE_URL}/api/auth/verify/${verificationToken}`;           
+            await sendEmail(user.email, "Verify Email", verificationLink);
+            res.status(201).json({ message : "please check your email "})
         }
 
         }else{
-            res.status(401)
-            throw Error('Invalide credentails')
+            res.status(401).json({error:'Invalide credentails'})
         }
     }) 
 

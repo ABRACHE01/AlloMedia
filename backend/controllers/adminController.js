@@ -16,4 +16,18 @@ export class adminController{
 
     }
 
+    static sendEmail = (req, res )=>{
+
+        UserController.sendEmail(req ,res)
+
+    }
+
+    static resetPasswordAsLoggedIn = (req, res )=>{
+
+        UserController.resetPasswordAsLoggedIn(req ,res)
+
+    }
+
+
+
 }

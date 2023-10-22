@@ -62,10 +62,9 @@ const sendEmail = async (email, subject, verificationLink) => {
       html: htmlTemplate,
     });
 
-    console.log("Email sent successfully");
+    return true;
   } catch (error) {
-    console.log("Email not sent");
-    console.error(error);
+   throw error;
   }
 };
 

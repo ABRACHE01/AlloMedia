@@ -11,10 +11,8 @@ const roles = [
   const seedRoles = async () => {
     try {
 
-      // Delete existing roles
       await Role.deleteMany();
   
-      // Insert the new roles
       await Role.insertMany(roles);
   
       console.log(`Roles seeded successfully`.cyan.bgMagenta);

@@ -7,10 +7,9 @@ export class authMiddleware {
   static protect = asyncHandler(async (req, res, next) => {
     let token;
 
-    if (req.cookies.token || req.params.token) {
+    if (req.cookies.al_ui || req.params.token) {
       try {
-     
-        token = req.cookies.token || req.params.token;
+        token = req.cookies.al_ui || req.params.token;
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const user = await User.findById(decoded.userPayload.id).populate('role').select('-password');
         

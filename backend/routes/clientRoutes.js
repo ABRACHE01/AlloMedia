@@ -7,5 +7,10 @@ clientRoutes.get('/client/me',authMiddleware.protect ,clientController.clientPro
 
 clientRoutes.get('/client/logout',authMiddleware.protect ,clientController.logout)
 
+//send email after auth for rest
+clientRoutes.post("/client/profileResetPass", authMiddleware.protect, clientController.sendEmail);
+
+//reset password after auth 
+clientRoutes.post("/client/newPassloggedin/:token",authMiddleware.protect, clientController.resetPasswordAsLoggedIn);
 
 export {clientRoutes}

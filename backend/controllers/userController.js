@@ -10,7 +10,6 @@ import jwt from "jsonwebtoken";
 
 
 
-
 export  class userController {
     
 
@@ -23,11 +22,11 @@ export  class userController {
             .json({ error: registerValidation.error.details.map((error) => error.message) });
         }
       
-        if (!req.file) {
-          return res
-            .status(400)
-            .json({ error: 'Please add all required fields, including an image' });
-        }
+        // if (!req.file) {
+        //   return res
+        //     .status(400)
+        //     .json({ error: 'Please add all required fields, including an image' });
+        // }
       
         const { name, email, role, password } = req.body;
       
@@ -44,7 +43,7 @@ export  class userController {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
       
-        const imagePath = req.file.path;
+        const imagePath =  req.file ? req.file.path : null ;
       
         const user = await User.create({
           name,

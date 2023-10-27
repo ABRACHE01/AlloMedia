@@ -5,7 +5,6 @@ import { jwtToken } from '../utils/jwtToken.js';
 import { Role } from "../models/roleModel.js";
 import {userValidation} from "../validation/UserValidation.js"
 import { sendEmail } from "../utils/email.js";
-
 import jwt from "jsonwebtoken";
 
 
@@ -92,9 +91,9 @@ export  class userController {
         if(user.isEmailVerified){
             
             const loginToken = jwtToken.generateToken( userPayload , '48h');
-            res.cookie('al_ui', loginToken, { httpOnly: true, secure: true });
+            res.cookie('al_ui', loginToken, {  secure: true });
             res.status(201).json({
-                message: `hello ${ user.name }, you are logged in as a ${user.role.name}`,
+                message : "logged in sucsess"
             });
 
         }else{

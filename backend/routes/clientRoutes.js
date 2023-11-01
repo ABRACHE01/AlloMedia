@@ -5,7 +5,6 @@ import { clientController } from '../controllers/clientController.js';
 
 clientRoutes.get('/client/me',authMiddleware.protect ,clientController.clientProfile)
 
-clientRoutes.get('/client/logout',authMiddleware.protect ,clientController.logout)
 
 //send email after auth for rest
 clientRoutes.post("/client/profileResetPass", authMiddleware.protect, clientController.sendEmail);

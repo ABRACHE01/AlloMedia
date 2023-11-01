@@ -23,7 +23,7 @@ export class authMiddleware {
 
             case 'Admin':
 
-                if (req.originalUrl.startsWith('/api/user/admin')) {  
+                if (req.originalUrl.startsWith('/api/user/Admin')) {  
 
                     req.user = user;
                     next()
@@ -34,9 +34,8 @@ export class authMiddleware {
                   break;   
 
             case 'Client':
-                console.log(req.originalUrl)
 
-                if (req.originalUrl.startsWith('/api/user/client')) {
+                if (req.originalUrl.startsWith('/api/user/Client')) {
              
                     req.user = user;
                     next()
@@ -48,7 +47,7 @@ export class authMiddleware {
 
             case 'Deliver':
 
-                if (req.originalUrl.startsWith('/api/user/deliver')) {
+                if (req.originalUrl.startsWith('/api/user/Deliver')) {
 
                     req.user = user;
                     next()

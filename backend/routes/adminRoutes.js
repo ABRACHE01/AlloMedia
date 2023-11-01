@@ -7,7 +7,6 @@ import { adminController } from '../controllers/adminController.js';
 
 
 adminRoutes.get('/admin/me',authMiddleware.protect ,adminController.adminProfile)
-adminRoutes.get('/admin/logout',authMiddleware.protect ,adminController.logout)
 
 //send email after auth for rest
 adminRoutes.post("/admin/profileResetPass", authMiddleware.protect, adminController.sendEmail);

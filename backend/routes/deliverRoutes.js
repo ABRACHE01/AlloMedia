@@ -7,7 +7,6 @@ import { deliverController } from '../controllers/deliverController.js';
 
 deliverRoutes.get('/deliver/me',authMiddleware.protect ,deliverController.deliverProfile)
 
-deliverRoutes.get('/deliver/logout',authMiddleware.protect ,deliverController.logout)
 
 //send email after auth for rest
 deliverRoutes.post("/deliver/profileResetPass", authMiddleware.protect, deliverController.sendEmail);

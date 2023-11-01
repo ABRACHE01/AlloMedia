@@ -2,30 +2,26 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import authService from './authService'
 
 
-const user = JSON.parse(localStorage.getItem('user'))
 
 
 const initialState = {
-    user: user ? user : null,
-    isError: false,
-    isSuccess: false,
-    isLoading: false,
-    message: '',
-  }
-
+  user: JSON.parse(localStorage.getItem('user')) || null,
+  isError: false,
+  isSuccess: false,
+  isLoading: false,
+  isAuth : JSON.parse(localStorage.getItem('isAuth'))|| null,
+  message: '',
+};
   //Register user
 export const register = createAsyncThunk(
   'auth/register',
   async (user, thunkAPI) => {
     try {
-      return await authService.register(user)
+       const response = await authService.register(user);
+      return response;
+
     } catch (error) {
-      const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString()
+      const message = error.response.data;
       return thunkAPI.rejectWithValue(message)
     }
   }
@@ -34,19 +30,85 @@ export const register = createAsyncThunk(
 // Login user
 export const login = createAsyncThunk('auth/login', async (user, thunkAPI) => {
   try {
-    
-    return await authService.login(user)
+    const response = await authService.login(user)
+    return response;
 
+  
   } catch (error) {
-
-    const message =
-      (error.response && error.response.data && error.response.data.message) ||
-      error.message ||
-      error.toString()
-    return thunkAPI.rejectWithValue(message)
-    
+      const message = error.response.data;
+      return thunkAPI.rejectWithValue(message)
   }
 })
+
+//logout
+export const logout = createAsyncThunk("auth/logout", async ( thunkAPI) => {
+  try {
+    const response = await authService.logout();
+    return response;
+    
+  } catch (error) {
+    const message = error.response.data;
+    return thunkAPI.rejectWithValue(message)
+  }
+});
+
+//forget password 
+export const sendEmforgetPass = createAsyncThunk("auth/sendEmforgetPass", async(user, thunkAPI)=>{
+    try{
+
+      const response = await authService.sendEmforgetPass(user)
+      return response;
+    } catch (error) {
+      const message = error.response.data;
+      return thunkAPI.rejectWithValue(message)
+    }
+})
+
+export const resetForgottenPass = createAsyncThunk("auth/resetForgottenPass", async(user , thunkAPI)=>{
+  try{
+
+    const response =await authService.resetForgottenPass(user)
+    return response 
+  } catch (error) {
+    const message = error.response.data;
+    return thunkAPI.rejectWithValue(message)
+  }
+})
+
+//reset password 
+export const sendEmResetPass = createAsyncThunk("user/role/sendEmResetPass", async(role , thunkAPI)=>{
+  
+  try{
+    const response = await authService.sendEmResetPass(role)
+    return response;
+  } catch (error) {
+    const message = error.response.data;
+    return thunkAPI.rejectWithValue(message)
+  }
+})
+
+export const resetLogedPass = createAsyncThunk("user/role/resetLogedPass", async(user , thunkAPI)=>{
+  try{
+
+    const response = await authService.resetLogedPass(user)
+    return response 
+  } catch (error) {
+    const message = error.response.data;
+    return thunkAPI.rejectWithValue(message)
+  }
+})
+
+// export const profile=  createAsyncThunk("user/role/me", async(role,thunkAPI)=>{
+//   try{
+//     const response = await authService.profile(role)
+//     return response;
+//   } catch (error) {
+//     const message = error.response.data;
+//     return thunkAPI.rejectWithValue(message)
+//   }
+// })
+
+
   
   export const authSlice = createSlice({
     name: 'auth',
@@ -68,29 +130,112 @@ export const login = createAsyncThunk('auth/login', async (user, thunkAPI) => {
         .addCase(register.fulfilled, (state, action) => {
           state.isLoading = false
           state.isSuccess = true
-          state.user = action.payload
+          state.message = action.payload 
         })
         .addCase(register.rejected, (state, action) => {
           state.isLoading = false
           state.isError = true
           state.message = action.payload
-          state.user = null
         })
+
+
+
         .addCase(login.pending, (state) => {
             state.isLoading = true
           })
+
           .addCase(login.fulfilled, (state, action) => {
             state.isLoading = false
             state.isSuccess = true
-            state.user = action.payload
+            state.message = action.payload
+            state.isAuth= JSON.parse(localStorage.getItem('isAuth'));
+            state.user = JSON.parse(localStorage.getItem('user'));
           })
+
           .addCase(login.rejected, (state, action) => {
             state.isLoading = false
             state.isError = true
             state.message = action.payload
-            state.user = null
           })
-       
+
+
+          .addCase(logout.pending, (state) => {
+            state.isLoading = true;
+          })
+          .addCase(logout.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.message = action.payload;
+            state.isAuth= false;
+            state.user = null;
+          })
+          .addCase(logout.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload;
+          })
+
+
+          .addCase(sendEmforgetPass.pending, (state) => {
+            state.isLoading = true;
+          })
+          .addCase(sendEmforgetPass.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.message = action.payload; 
+          })
+          .addCase(sendEmforgetPass.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload;
+          })
+          
+          .addCase(resetForgottenPass.pending, (state) => {
+            state.isLoading = true;
+          })
+          .addCase(resetForgottenPass.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.message = action.payload; 
+          })
+          .addCase(resetForgottenPass.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload;
+          })
+
+
+          .addCase(sendEmResetPass.pending, (state) => {
+            state.isLoading = true;
+          })
+          .addCase(sendEmResetPass.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.message = action.payload; 
+          })
+          
+          .addCase(sendEmResetPass.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload;
+          })
+
+          .addCase(resetLogedPass.pending, (state) => {
+            state.isLoading = true;
+          })
+          .addCase(resetLogedPass.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.message = action.payload; 
+          })
+          .addCase(resetLogedPass.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.message = action.payload;
+          })
+
+          
+
     },
   })
   

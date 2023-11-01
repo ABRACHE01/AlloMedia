@@ -5,7 +5,6 @@ import { jwtToken } from '../utils/jwtToken.js';
 import { Role } from "../models/roleModel.js";
 import {userValidation} from "../validation/UserValidation.js"
 import { sendEmail } from "../utils/email.js";
-
 import jwt from "jsonwebtoken";
 
 
@@ -84,6 +83,7 @@ export  class userController {
             const userPayload = {
                 id: user.id,
                 name: user.name,
+                email: user.email,
                 role: user.role,
                 isEmailVerified: user.isEmailVerified,
               };
@@ -92,16 +92,16 @@ export  class userController {
         if(user.isEmailVerified){
             
             const loginToken = jwtToken.generateToken( userPayload , '48h');
-            res.cookie('al_ui', loginToken, { httpOnly: true, secure: true });
-            res.status(201).json({
-                message: `hello ${ user.name }, you are logged in as a ${user.role.name}`,
+            res.cookie('al_ui', loginToken, {  secure: true });
+            res.status(200).json({
+                message : "logged in sucsessfully"
             });
 
         }else{
             const verificationToken = jwtToken.generateToken(userPayload , '10m')
             const verificationLink = `${process.env.BASE_URL}/api/auth/verify/${verificationToken}`;           
             await sendEmail(user.email, "Verify Email", verificationLink);
-            res.status(201).json({ message : "please check your email "})
+            res.status(200).json({ message : "please check your email"})
         }
 
         }else{
@@ -152,28 +152,25 @@ export  class userController {
           return res.status(400).send("Invalid token");
         }
     });
-
+    
     //forger password 
     forgotPassword = asyncHandler(async(req , res )=>{
 
         const { email } = req.body
 
         if (!email){
-            res.status(400)
-            throw new Error('Please add all fields')
+            res.status(400).json({error:'Please email fieled'})
         }
 
         const user = await User.findOne({email});
         if(!user){
-            res.status(400)
-            throw new Error('no user with this email found')
+          res.status(400).json({error:'no user with this email found'})
         }
 
         const verificationToken = jwtToken.generateToken(user._id , '10m') 
-        const verificationLink = `${process.env.BASE_URL}/api/auth/newPass/${verificationToken}`;
+        const verificationLink = `http://localhost:5173/setpassword?token=${verificationToken}`;
         await sendEmail(user.email, "Forgot Password", verificationLink);
-        res.json({ message : "please check your email "})
-
+        res.status(200).json({ message : "please check your email "})
 
     });
       
@@ -196,7 +193,7 @@ export  class userController {
             const user = await User.findOne({ _id: userId });
           
             if (!user) {
-              return res.status(400).send("Invalid user");
+              return res.status(400).json({error:"Invalid user"});
             }
 
             const salt = await bcrypt.genSalt(10)
@@ -204,15 +201,15 @@ export  class userController {
             
             await User.updateOne({ _id: userId }, { password: hashedPassword });
           
-            res.send("Password reseted successfully");
+            res.status(200).json({message :"password resseted successfully "});
   
           } catch (err) {
   
             if (err.name === "TokenExpiredError") {
-              return res.status(400).send("Your token has expired");
+              return res.status(400).json({error :"Your token has expired"});
             }
                   
-            return res.status(400).send("Invalid token");
+            return res.status(400).json({error :"Invalid token"});
           }
 
     });
@@ -222,21 +219,21 @@ export  class userController {
         
         const { email }=req.user;
 
+        console.log(req.user)
+        
         if (!email){
-            res.status(400)
-            throw new Error('Please add all fields')
+            res.status(400).json({error:'Please add all fields'})
         }
 
         const user = await User.findOne({email});
         if(!user){
-            res.status(400)
-            throw new Error('no user with this email found')
+            res.status(400).json({error:'no user with this email found'})
         }
 
         const verificationToken = jwtToken.generateToken(user._id , '10m')
-        const verificationLink = `${process.env.BASE_URL}/api/auth/newPassloggedin/${verificationToken}`;
+        const verificationLink = `http://localhost:5173/resetpassword?token=${verificationToken}`;
         await sendEmail(user.email, "Forgot Password", verificationLink);
-        res.json({ message : "please check your email "})
+        res.status(200).json({ message : "email verification sent , please check your email "})
 
     });
 
@@ -265,18 +262,17 @@ export  class userController {
             
             await User.updateOne({ _id: req.user.id }, { password: hashedPassword });
           
-            res.send("Password reseted successfully");
+            res.status(200).json({message:"Password reseted successfully"});
             
         }else{
-            res.status(400)
-            throw new Error('invalid credantele')
+            res.status(400).json({error:'invalid credantele'})
         }
         
 
     });
 
     logout = (req, res) => {
-        res.clearCookie('token').send('Logged out successfully');
+        res.clearCookie('al_ui').status(200).json({messsage:'Logged out successfully'});
       }
 
 

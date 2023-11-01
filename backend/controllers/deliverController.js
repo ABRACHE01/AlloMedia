@@ -10,11 +10,7 @@ export class deliverController{
 
     }
 
-    static logout = (req, res )=>{
 
-        UserController.logout(req ,res)
-
-    }
 
     static sendEmail = (req, res )=>{
 

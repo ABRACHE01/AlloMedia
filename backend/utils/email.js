@@ -8,13 +8,13 @@ const sendEmail = async (email, subject, verificationLink) => {
     let htmlTemplate ;
 
     let transporter = nodemailer.createTransport({
-      host: process.env.HOST,
-      port: 2525,
-      auth: {
-        user: 'e0400916a8ed83',
-        pass: process.env.PASS
-      }
-    });
+        host: "sandbox.smtp.mailtrap.io",
+        port: 2525,
+        auth: {
+          user: "81529807402e34",
+          pass: "1320bfa38281f7"
+        }
+      });
 
     if(subject == "Verify Email"){
      htmlTemplate = `

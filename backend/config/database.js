@@ -1,6 +1,8 @@
 
 import mongoose from "mongoose";
  import { config } from 'dotenv';
+ import colors from "colors"
+
 config();
 
 const dbURI = process.env.MONGODB_URI ; 

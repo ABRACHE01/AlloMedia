@@ -3,7 +3,7 @@
   "scripts": {
     "start": "npx nodemon backend/server.js",
     "test": "jest ",
-    "client": "npm run dev --prefix frontend",
+    "client": "npm run dev --prefix ../frontend",
     "dev": "concurrently \"npm run start\" \"npm run client\""
   },
   "jest": {
@@ -24,12 +24,23 @@
     "mongoose": "^7.6.2",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.6",
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.23.2",
     "babel-jest": "^29.7.0",
     "concurrently": "^8.2.2",
     "jest": "^29.7.0"
-  }
+  },
+  "name": "backend",
+  "description": "In this README, we'll guide you through the process of cloning the AlloMedia repository, which is an application for delivery services. We'll also show you how to set it up and run the server and the database. Let's get started!",
+  "version": "1.0.0",
+  "main": "server.js",
+  "directories": {
+    "test": "tests"
+  },
+  "author": "",
+  "license": "ISC"
 }

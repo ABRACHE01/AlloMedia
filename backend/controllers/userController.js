@@ -173,7 +173,7 @@ export  class userController {
         res.status(200).json({ message : "please check your email "})
 
     });
-      
+    
     resetPassword = asyncHandler(async(req,res)=>{
 
      

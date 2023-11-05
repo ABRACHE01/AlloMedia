@@ -20,12 +20,13 @@ import { Link } from "react-router-dom";
 function Header() {
   const { user } = useSelector((state) => state.auth);
   const role = user?.userPayload.role.name;
+  const dashLink = `user/${role}/dashboard`
   const profile = `user/${role}/me`;
 
   const dispatch = useDispatch();
 
-  const handleLogout = () => {
-    dispatch(logout());
+  const handleLogout = async() => {
+   await dispatch(logout());
     toast.success("logged out successfuly");
   };
 
@@ -35,18 +36,20 @@ function Header() {
 
   return (
     <>
-      <Navbar shouldHideOnScroll>
+      <Navbar shouldHideOnScroll >
         <NavbarBrand>
-          <p className="font-bold text-inherit">
-            {" "}
-            <Link to="/">ALLOMEDIA</Link>
+          <p className="font-bold">
+            {""}
+            <Link to="/" className="">ALLOMEDIA</Link>
           </p>
         </NavbarBrand>
 
         {user ? (
           <>
             <NavbarContent className="hidden sm:flex gap-4" justify="center">
-              <NavbarItem></NavbarItem>
+              <NavbarItem as={Link}  color="foreground" to={dashLink}>  
+                      Dashboard
+              </NavbarItem>
             </NavbarContent>
 
             <NavbarContent as="div" justify="end">
@@ -97,12 +100,14 @@ function Header() {
           </>
         ) : (
           <NavbarContent justify="end">
-            <NavbarItem className="hidden lg:flex">
-              <Link to="/login">Login</Link>
+            <NavbarItem>
+              <Link className="font-bold " to="/login" >
+                Login
+              </Link>
             </NavbarItem>
 
             <NavbarItem>
-              <Button as={Link} to="/register" color="primary" variant="flat">
+              <Button as={Link} to="/register" className="font-bold text-white " color="success" >
                 Sign Up
               </Button>
             </NavbarItem>

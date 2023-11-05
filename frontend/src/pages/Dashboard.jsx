@@ -19,7 +19,7 @@ export default function Dashboard() {
     return <Spinner />;
   }
   return (
-    <div>
+    <div className="flex flex-col justify-center items-center h-[30rem] bg-gray-50 " >
       <h1>Welcome, {user.name}!</h1>
       <h2>you're, an {user.role.name}!</h2>
     </div>

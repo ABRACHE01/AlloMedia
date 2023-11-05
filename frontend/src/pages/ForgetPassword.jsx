@@ -17,7 +17,7 @@ export default function ForgetPassword() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { isLoading, isError, isSuccess, message } = useSelector((state) => state.auth);
+  const { isLoading, message } = useSelector((state) => state.auth);
 
   useEffect(() => {
     if (message?.error) {
@@ -34,7 +34,7 @@ export default function ForgetPassword() {
       navigate('/login')
     }
     dispatch(reset());
-  }, [isError, isSuccess, message, dispatch]);
+  }, [ message, dispatch]);
 
   const initialValues = {
     email: '',

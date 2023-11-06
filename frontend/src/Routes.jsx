@@ -52,7 +52,7 @@ const publicRoutes = [
   {
     path: '/resetpassword',
     element: <Resetpassword />,
-    restricted: true,
+    restricted: false,
   },
 ];
 

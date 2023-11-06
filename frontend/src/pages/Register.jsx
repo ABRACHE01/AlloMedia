@@ -9,16 +9,16 @@ import { register, reset } from "../features/auth/authSlice";
 import Spinner from "../components/Spinner";
 
 const validationSchema = Yup.object().shape({
-  name: Yup.string().required("Name is required"),
+  name: Yup.string().required("*Name is required"),
   email: Yup.string()
-    .email("Invalid email address")
-    .required("Email is required"),
+    .email("*Invalid email address")
+    .required("*Email is required"),
   password: Yup.string()
-    .min(8, "Password must be at least 8 characters long")
-    .required("Password is required"),
+    .min(8, "*Password must be at least 8 characters long")
+    .required("*Password is required"),
   repeat_password: Yup.string()
-    .oneOf([Yup.ref("password"), null], "Passwords must match")
-    .required("Please confirm your password"),
+    .oneOf([Yup.ref("password"), null], "*Passwords must match")
+    .required("*Please confirm your password"),
 });
 
 function Register() {
@@ -94,6 +94,7 @@ function Register() {
                   validationSchema={validationSchema}
                 >
                   <Form className="space-y-4 md:space-y-6">
+                  <div className="form-group">
                     <Field
                       type="text"
                       className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-success-600 focus:border-success-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -104,9 +105,10 @@ function Register() {
                     <ErrorMessage
                       name="name"
                       component="div"
-                      className="error"
+                      className="error text-red-500 font-light text-sm m-1"
                     />
-
+                  </div>
+                  <div className="form-group">
                     <Field
                       type="email"
                       className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-success-600 focus:border-success-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -117,9 +119,11 @@ function Register() {
                     <ErrorMessage
                       name="email"
                       component="div"
-                      className="error"
+                      className="error text-red-500 font-light text-sm m-1"
                     />
+                    </div>
 
+                    <div className="form-group">
                     <Field
                       type="password"
                       className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-success-600 focus:border-success-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -130,9 +134,11 @@ function Register() {
                     <ErrorMessage
                       name="password"
                       component="div"
-                      className="error"
+                      className="error text-red-500 font-light text-sm m-1"
                     />
+                    </div>
 
+                    <div className="form-group">
                     <Field
                       type="password"
                       className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-success-600 focus:border-success-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -143,9 +149,9 @@ function Register() {
                     <ErrorMessage
                       name="repeat_password"
                       component="div"
-                      className="error"
+                      className="error text-red-500 font-light text-sm m-1"
                     />
-                    
+                    </div>
 
                     <div className="form-group">
                       <Field
@@ -159,9 +165,10 @@ function Register() {
                       <ErrorMessage
                         name="role"
                         component="div"
-                        className="error"
-                      />
+                        className="error text-red-500 font-light text-sm m-1"
+                        />
                     </div>
+
                     <div className="flex items-start">
                       <div className="flex items-center h-5">
                         <input

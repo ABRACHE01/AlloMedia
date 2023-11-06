@@ -13,6 +13,7 @@ import {
   Avatar,
   DropdownMenu,
   DropdownItem,
+  button,
 } from "@nextui-org/react";
 
 import { Link } from "react-router-dom";
@@ -40,14 +41,14 @@ function Header() {
         <NavbarBrand>
           <p className="font-bold">
             {""}
-            <Link to="/" className="">ALLOMEDIA</Link>
+            <Link to="/" >ALLOMEDIA</Link>
           </p>
         </NavbarBrand>
 
         {user ? (
           <>
             <NavbarContent className="hidden sm:flex gap-4" justify="center">
-              <NavbarItem as={Link}  color="foreground" to={dashLink}>  
+              <NavbarItem as={Link}  to={dashLink}>  
                       Dashboard
               </NavbarItem>
             </NavbarContent>
@@ -62,21 +63,23 @@ function Header() {
                     color="secondary"
                     name="Jason Hughes"
                     size="sm"
-                    src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
+                    src="https://i.pravatar.cc/150?u=a04258114e29026302d"
                   />
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Profile Actions" variant="flat">
                   <DropdownItem
                     key="profile"
                     className="h-14 gap-2"
-                    textValue="Signed in as zoey@example.com"
+                    textValue="Signed in as"
                   >
-                    <p className="font-semibold">Signed in as</p>
-                    <p className="font-semibold">{role}</p>
+                    <p className="font-semibold">Signed in as {role}</p>
+                    <p className="font-semibold text-success-500 ">{user.userPayload.email}</p>
                   </DropdownItem>
 
                   <DropdownItem key="settings" textValue="My Settings">
-                    <Link color="foreground" to={profile}>
+                    <Link color="foreground" 
+                    to={profile}
+                    >
                       Profile
                     </Link>
                   </DropdownItem>

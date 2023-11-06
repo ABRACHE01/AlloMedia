@@ -4,17 +4,16 @@ import nodemailer from "nodemailer"
 
 const sendEmail = async (email, subject, verificationLink) => {
   try {
-
     let htmlTemplate ;
 
-    let transporter = nodemailer.createTransport({
-        host: "sandbox.smtp.mailtrap.io",
-        port: 2525,
-        auth: {
-          user: "81529807402e34",
-          pass: "1320bfa38281f7"
-        }
-      });
+    var transporter = nodemailer.createTransport({
+      host: "sandbox.smtp.mailtrap.io",
+      port: 2525,
+      auth: {
+        user: "5e1fc5fc98e63c",
+        pass: "592971137e2d2d"
+      }
+    });
 
     if(subject == "Verify Email"){
      htmlTemplate = `

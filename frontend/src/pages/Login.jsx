@@ -9,11 +9,11 @@ import Spinner from "../components/Spinner";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
-    .email("Invalid email address")
-    .required("Email is required"),
+    .email("*Invalid email address")
+    .required("*Email is required"),
   password: Yup.string()
-    .min(8, "Password must be at least 8 characters long")
-    .required("Password is required"),
+    .min(8, "*Password must be at least 8 characters long")
+    .required("*Password is required"),
 });
 
 function Login() {
@@ -73,7 +73,7 @@ function Login() {
                     <ErrorMessage
                       name="email"
                       component="div"
-                      className="error"
+                      className="error text-red-500 font-light text-sm m-1"
                     />
                   </div>
                   <div className="form-group">
@@ -87,7 +87,7 @@ function Login() {
                     <ErrorMessage
                       name="password"
                       component="div"
-                      className="error"
+                      className="error text-red-500 font-light text-sm m-1"
                     />
                   </div>
 

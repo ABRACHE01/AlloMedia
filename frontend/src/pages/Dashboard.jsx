@@ -1,8 +1,8 @@
 import Spinner from '../components/Spinner';
-import { useEffect } from 'react';
 import { toast } from 'react-toastify';
 import {  reset } from '../features/auth/authSlice';
 import { useSelector, useDispatch } from 'react-redux';
+import {Card, CardBody} from "@nextui-org/react";
 
 export default function Dashboard() {
   const dispatch = useDispatch();
@@ -15,13 +15,19 @@ export default function Dashboard() {
     dispatch(reset());
     }
 
-  if (isLoading) {
-    return <Spinner />;
-  }
+
   return (
+    <>
+    {isLoading && <Spinner />}
     <div className="flex flex-col justify-center items-center h-[30rem] bg-gray-50 " >
-      <h1>Welcome, {user.name}!</h1>
-      <h2>you're, an {user.role.name}!</h2>
+
+    <Card>
+      <CardBody>
+      <h1 className="font-bold text-large">Welcome, {user.name}!</h1>
+      <h2 className="font-bold text-large">you're, a {user.role.name}!</h2>
+      </CardBody>
+    </Card>
     </div>
+    </>  
   );
 }

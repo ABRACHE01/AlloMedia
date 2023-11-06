@@ -93,12 +93,6 @@ const resetLogedPass = async(userData ) =>{
 
 }
 
-// const profile = async(role) =>{
-//   const response = await axios.get(API_URL + `user/${role}/me` )
-//   if (response.data) {
-//     return response.data
-//   }
-// }
 
   const authService = {
     login,

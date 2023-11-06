@@ -1,28 +1,26 @@
-import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import Spinner from '../components/Spinner';
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 import { resetForgottenPass, reset } from "../features/auth/authSlice";
-import { useLocation, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import * as Yup from 'yup';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import Spinner from "../components/Spinner";
+import { useNavigate } from "react-router-dom";
 
 const validationSchema = Yup.object().shape({
-  newPassword: Yup.string().required('New password is required'),
+  newPassword: Yup.string().required("*New password is required"),
   repeat_newPassword: Yup.string()
-    .required('Confirm new password is required')
-    .oneOf([Yup.ref('newPassword')], 'Passwords must match'),
+    .required("*Confirm new password is required")
+    .oneOf([Yup.ref("newPassword")], "*Passwords must match"),
 });
 
 export default function SetPassword() {
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const token = queryParams.get('token');
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { isLoading, isError, isSuccess, message } = useSelector((state) => state.auth);
+  const { isLoading,message } = useSelector(
+    (state) => state.auth
+  );
 
   useEffect(() => {
     if (message?.error) {
@@ -36,14 +34,14 @@ export default function SetPassword() {
     }
     if (message?.message) {
       toast.success(message.message);
-      navigate('/login')
+      navigate("/login");
     }
     dispatch(reset());
-  }, [isError, isSuccess, message, dispatch]);
+  }, [ message, dispatch, navigate]);
 
   const initialValues = {
-    newPassword: '',
-    repeat_newPassword: '',
+    newPassword: "",
+    repeat_newPassword: "",
   };
 
   const onSubmit = (values) => {
@@ -55,49 +53,66 @@ export default function SetPassword() {
     dispatch(resetForgottenPass(data));
   };
 
-  if (isLoading) {
-    return <Spinner />;
-  }
 
   return (
     <>
-      <section className='heading'>
-        <h1>Set New Password</h1>
-        <p>Please fill in the following fields</p>
-      </section>
+      {isLoading && <Spinner />}
+      <section className="bg-gray-50 dark:bg-gray-900">
+        <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+          <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+            <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+              <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+               reset your password
+              </h1>
+              <Formik
+                initialValues={initialValues}
+                onSubmit={onSubmit}
+                validationSchema={validationSchema}
+              >
+                <Form className="space-y-4 md:space-y-6">
+                  <div className="form-group">
+                    <Field
+                      type="password"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-success-600 focus:border-success-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      id="newPassword"
+                      name="newPassword"
+                      placeholder="Enter new password"
+                    />
+                    <ErrorMessage
+                      name="newPassword"
+                      component="div"
+                      className="error text-red-500 font-light text-sm m-1"
+                    />
+                  </div>
 
-      <section className='form'>
-        <Formik initialValues={initialValues} onSubmit={onSubmit} validationSchema={validationSchema}>
-          <Form>
-            <div className='form-group'>
-              <Field
-                type='password'
-                className='form-control'
-                id='newPassword'
-                name='newPassword'
-                placeholder='Enter new password'
-              />
-              <ErrorMessage name='newPassword' component='div' className='error' />
-            </div>
+                  <div className="form-group">
+                    <Field
+                      type="password"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-success-600 focus:border-success-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      id="repeat_newPassword"
+                      name="repeat_newPassword"
+                      placeholder="Confirm new password"
+                    />
+                    <ErrorMessage
+                      name="repeat_newPassword"
+                      component="div"
+                      className="error text-red-500 font-light text-sm m-1"
+                    />
+                  </div>
 
-            <div className='form-group'>
-              <Field
-                type='password'
-                className='form-control'
-                id='repeat_newPassword'
-                name='repeat_newPassword'
-                placeholder='Confirm new password'
-              />
-              <ErrorMessage name='repeat_newPassword' component='div' className='error' />
+                  <div className="form-group">
+                    <button
+                      type="submit"
+                      className="w-full text-white bg-success-600 hover:bg-success-700 focus:ring-4 focus:outline-none focus:ring-success-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-success-600 dark:hover:bg-success-700 dark:focus:ring-success-800"
+                      >
+                      Reset Password
+                    </button>
+                  </div>
+                </Form>
+              </Formik>
             </div>
-
-            <div className='form-group'>
-              <button type='submit' className='btn btn-block'>
-                Submit
-              </button>
-            </div>
-          </Form>
-        </Formik>
+          </div>
+        </div>
       </section>
     </>
   );

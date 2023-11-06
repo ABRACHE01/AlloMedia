@@ -98,16 +98,6 @@ export const resetLogedPass = createAsyncThunk("user/role/resetLogedPass", async
   }
 })
 
-// export const profile=  createAsyncThunk("user/role/me", async(role,thunkAPI)=>{
-//   try{
-//     const response = await authService.profile(role)
-//     return response;
-//   } catch (error) {
-//     const message = error.response.data;
-//     return thunkAPI.rejectWithValue(message)
-//   }
-// })
-
 
   
   export const authSlice = createSlice({
